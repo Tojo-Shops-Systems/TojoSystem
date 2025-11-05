@@ -16,7 +16,12 @@ class PersonResource extends JsonResource
     {
         return [
             'id'         => $this->id,
-            'firstName'  => $this->firstName
+            'firstName'  => $this->firstName,
+            'user' => $this->whenLoaded('user', function () {
+                return [
+                    'userType' => $this->user->userType,
+                ];
+            }),
         ];
     }
 }
