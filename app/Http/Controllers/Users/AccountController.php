@@ -79,7 +79,7 @@ class AccountController extends Controller
                 'min:8',
                 'confirmed',
                 Password::min(8)->letters()->mixedCase()->numbers()->symbols()
-                ],
+            ],
             'person_id' => 'required|exists:persons,id'
         ]);
 
@@ -154,6 +154,9 @@ class AccountController extends Controller
 
     public function logout(Request $request)
     {
+        /* EXPECTED DATA
+        Authorization: Bearer 1|eqCl12LTF3DWq6i0HKEIXoYh0QeFojql4uWbx399e983e9e6
+        */
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
