@@ -4,7 +4,7 @@ namespace App\Models\User;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
 
 class Person extends Model
 {
@@ -18,11 +18,6 @@ class Person extends Model
         'CURP',
         'phoneNumber',
     ];
-
-    public function setCURPAttribute($value)
-    {
-        $this->attributes['CURP'] = Hash::make($value);
-    }
 
     // app/Models/User/Person.php
     public function user()

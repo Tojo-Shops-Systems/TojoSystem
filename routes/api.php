@@ -24,6 +24,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/personalData', [AccountController::class, 'registerPerson']);
     Route::post('/register', [AccountController::class, 'register']);
     Route::post('/login', [AccountController::class, 'login']);
+    Route::post('/identifyPerson', [AccountController::class, 'identifyPerson']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AccountController::class, 'logout']);

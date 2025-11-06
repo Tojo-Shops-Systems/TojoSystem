@@ -157,11 +157,59 @@ class AccountController extends Controller
         /* EXPECTED DATA
         Authorization: Bearer 1|eqCl12LTF3DWq6i0HKEIXoYh0QeFojql4uWbx399e983e9e6
         */
-        $request->user()->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()->delete(); # It will display an error but it works correctly, ignore the error.
 
         return response()->json([
             'result' => true,
             'msg' => 'Sesión cerrada correctamente.'
         ], 200);
+    }
+
+    public function identifyPerson(Request $request)
+    {
+        /* EXPECTED DATA
+        {
+            "CURP": "AAAA000000AAAAAAA0"
+        }
+        */
+        $validatedData = Validator::make($request->all(), [
+            'CURP' => 'required|string|max:18'
+        ]);
+
+        if ($validatedData->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => "Error de validación.",
+                'data' => $validatedData->errors()
+            ], 422);
+        }
+
+        $validated = $validatedData->validated();
+
+        try {
+            $person = Person::where('CURP', $validated['CURP'])->first();
+
+            if (!$person) {
+                return response()->json([
+                    'result' => false,
+                    'msg' => "No se encontró ninguna persona con esa CURP."
+                ], 404);
+            }
+
+            return response()->json([
+                'result' => true,
+                'msg' => "Persona identificada correctamente.",
+                'data' => [
+                    'id' => $person->id,
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'msg' => "Error interno del servidor.",
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
