@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\AccountController;
+use App\Http\Controllers\Sales\SuppliersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,4 +30,8 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AccountController::class, 'logout']);
     });
+});
+
+Route::middleware('auth:sanctum')->group(function (){
+    Route::post('/suppliers/register', [SuppliersController::class, 'registerSupplier']);
 });
