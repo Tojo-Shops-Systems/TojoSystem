@@ -45,8 +45,9 @@ class SuppliersController extends Controller
         ], 201);
     }
 
-    public function getSuppliers(Request $request){
-        if (!$request->has('id')){
+    public function getSuppliers(Request $request, $id=null){
+        # Without dinamic route: http://localhost:8000/api/suppliers
+        if ($id == null){
             $suppliers = Supplier::all();
 
             return response()->json([
@@ -55,22 +56,25 @@ class SuppliersController extends Controller
                 'data' => SupplierResource::collection($suppliers)
             ]);
         }
-        else {
-            $supplierData = Supplier::find($request->id);
 
-            if (!$supplierData){
-                return response()->json([
-                    'result' => false,
-                    'msg' => "Proveedor no encontrado",
-                    'data' => null
-                ]);
-            }
+        # With dinamic route: http://localhost:8000/api/suppliers/{id}
+        $supplierData = Supplier::find($id);
 
+        if (!$supplierData) {
             return response()->json([
-                'result' => true,
-                'msg' => "Informacion encontrada",
-                'data' => $supplierData
-            ]);
+                'result' => false,
+                'msg' => "Proveedor no encontrado",
+                'data' => null
+            ], 404);
         }
+
+        return response()->json([
+            'result' => true,
+            'msg' => "Información encontrada",
+            'data' => new SupplierResource($supplierData)
+        ]);
+    }
+
+    public function getSupplierProducts(Request $request){
     }
 }
