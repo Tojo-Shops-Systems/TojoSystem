@@ -19,6 +19,7 @@ class Ticket extends Model
         'totalAmount',
         'cashier',
         'customer',
+        'status',
         'date',
     ];
 
@@ -27,6 +28,7 @@ class Ticket extends Model
         'cashier' => 'array',
         'customer' => 'array',
         'totalAmount' => 'float',
+        'status' => 'string',
         'date' => 'datetime',
     ];
 }
