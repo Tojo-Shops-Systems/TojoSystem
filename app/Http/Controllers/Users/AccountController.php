@@ -72,7 +72,7 @@ class AccountController extends Controller
         }
         */
         $validator = Validator::make($request->all(), [
-            'userType' => 'required|string|max:15',
+            'userType' => 'nullable|string|max:15',
             'email' => 'required|string|email|unique:users,email',
             'password' => [
                 'required',

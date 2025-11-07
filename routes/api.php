@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\AccountController;
 use App\Http\Controllers\Sales\SuppliersController;
 use App\Http\Controllers\Sales\ProductsController;
+use App\Http\Controllers\BranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,12 @@ Route::prefix('auth')->group(function () {
         Route::post('/logout', [AccountController::class, 'logout']);
     });
 });
+
+# Just the CEO can do this
+Route::middleware(['auth:sanctum', 'verifyUserType:CEO'])->group(function () {
+    Route::post('/createBranch', [BranchController::class, 'createBranch']);
+});
+
 
 Route::middleware('auth:sanctum')->group(function (){
     Route::post('/suppliers/register', [SuppliersController::class, 'registerSupplier']);
