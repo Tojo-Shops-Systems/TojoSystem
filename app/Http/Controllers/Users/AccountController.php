@@ -67,6 +67,7 @@ class AccountController extends Controller
             "email": "jaret@email.com",
             "password": "J@ret1234",
             "password_confirmation": "J@ret1234",
+            "branch_id": 1 or nullable
             "person_id": 1
         }
         */
@@ -80,6 +81,7 @@ class AccountController extends Controller
                 'confirmed',
                 Password::min(8)->letters()->mixedCase()->numbers()->symbols()
             ],
+            'branch_id' => 'nullable|string|max:25',
             'person_id' => 'required|exists:persons,id'
         ]);
 
