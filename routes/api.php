@@ -34,4 +34,5 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function (){
     Route::post('/suppliers/register', [SuppliersController::class, 'registerSupplier']);
+    Route::post('/suppliers/getSuppliers', [SuppliersController::class, 'getSuppliers']);
 });

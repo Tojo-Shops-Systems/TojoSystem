@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SupplierResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Inventory\Supplier;
@@ -42,5 +43,34 @@ class SuppliersController extends Controller
             'result' => true,
             'msg' => "Se dio de alta correctamente el proveedor",
         ], 201);
+    }
+
+    public function getSuppliers(Request $request){
+        if (!$request->has('id')){
+            $suppliers = Supplier::all();
+
+            return response()->json([
+                'result' => true,
+                'msg' => 'Se obtuvieron todos los proveedores',
+                'data' => SupplierResource::collection($suppliers)
+            ]);
+        }
+        else {
+            $supplierData = Supplier::find($request->id);
+
+            if (!$supplierData){
+                return response()->json([
+                    'result' => false,
+                    'msg' => "Proveedor no encontrado",
+                    'data' => null
+                ]);
+            }
+
+            return response()->json([
+                'result' => true,
+                'msg' => "Informacion encontrada",
+                'data' => $supplierData
+            ]);
+        }
     }
 }
