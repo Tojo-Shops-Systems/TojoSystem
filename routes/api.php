@@ -35,12 +35,18 @@ Route::prefix('auth')->group(function () {
 });
 
 # Just the CEO can do this
-Route::middleware(['auth:sanctum', 'verifyUserType:CEO'])->group(function () {
-    Route::post('/createBranch', [BranchController::class, 'createBranch']);
+Route::middleware(['auth:sanctum', 'verifyUserType:CEO,RH'])->group(function () {
 });
 
+# Just the Boss can do this
+Route::middleware(['auth:sanctum', 'BossIdentify:Boss'])->group(function () {
+    Route::post('/boss/createBranch', [BranchController::class, 'createBranch']);
+    Route::patch('/boss/assignBranch', [BranchController::class, 'assignBranch']);
+    Route::get('/boss/getBranch', [BranchController::class, 'getBranch']);
+});
 
-Route::middleware('auth:sanctum')->group(function (){
+# Just for the employees on the shop
+Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(function (){
     Route::post('/suppliers/register', [SuppliersController::class, 'registerSupplier']);
     Route::get('/suppliers/{id?}', [SuppliersController::class, 'getSuppliers']);
     Route::post('/products/registerProduct', [ProductsController::class, 'registerProduct']);
