@@ -98,4 +98,36 @@ class ProductsController extends Controller
             'data' => ProductResource::collection($products)
         ]);
     }
+
+    public function productDeregister(Request $request){
+        $request->validate([
+            'id' => 'required|integer|exists:products,id'
+        ]);
+
+        $product = Product::find($request->id);
+
+        if (!$product) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'El producto no existe o ya fue eliminado.'
+            ], 404);
+        }
+
+        try {
+            $product->delete();
+
+            return response()->json([
+                'result' => true,
+                'msg' => 'El producto fue dado de baja correctamente.',
+                'deleted_id' => $request->id
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error interno al eliminar el producto.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

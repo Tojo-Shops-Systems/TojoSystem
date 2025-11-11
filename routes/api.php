@@ -43,6 +43,7 @@ Route::middleware(['auth:sanctum', 'BossIdentify:Boss'])->group(function () {
     Route::post('/boss/createBranch', [BranchController::class, 'createBranch']);
     Route::patch('/boss/assignBranch', [BranchController::class, 'assignBranch']);
     Route::get('/boss/getBranch', [BranchController::class, 'getBranch']);
+    Route::delete('/boss/productDeregister', [ProductsController::class, 'productDeregister']);
 });
 
 # Just for the employees on the shop
