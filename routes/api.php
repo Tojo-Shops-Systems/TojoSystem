@@ -6,6 +6,7 @@ use App\Http\Controllers\Users\AccountController;
 use App\Http\Controllers\Sales\SuppliersController;
 use App\Http\Controllers\Sales\ProductsController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\Sales\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,4 +53,5 @@ Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(fun
     Route::get('/suppliers/{id?}', [SuppliersController::class, 'getSuppliers']);
     Route::post('/products/registerProduct', [ProductsController::class, 'registerProduct']);
     Route::get('/products', [ProductsController::class, 'getProducts']);
+    Route::post('/purchaseInShop', [TicketController::class, 'purchaseInShop']);
 });

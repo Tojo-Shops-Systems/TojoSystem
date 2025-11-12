@@ -5,22 +5,39 @@ namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sales\Ticket;
-use App\Models\User\User;
-use App\Models\User\Person;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class TicketController extends Controller
 {
     public function purchaseInShop(Request $request)
     {
+        /* EXPECTED DATA
+        {
+            "items": [
+                {
+                    "name": "Coca de 600",
+                    "price": 22.00,
+                    "quantity": 50
+                },
+                {
+                    "name": "Chetos",
+                    "price": 20.00,
+                    "quantity": 1
+                }
+            ],
+            "totalAmount": 44.00,
+            "customer": null
+        }
+        */
+        $user = $request->user();
+
         $purchaseInShop = Validator::make($request->all(), [
-            'ticketID' => 'required|string|unique:tickets,ticketID',
             'items' => 'required|array',
             'items.*.name' => 'required|string',
             'items.*.price' => 'required|numeric',
             'items.*.quantity' => 'required|integer',
             'totalAmount' => 'required|numeric',
-            'cashier' => 'required|array',
             'customer' => 'nullable|array',
         ]);
 
@@ -32,13 +49,24 @@ class TicketController extends Controller
             ], 422);
         }
 
+        $person = $user->person;
+        $branch = $user->branch;
+
+        $cashierData = [
+            'firstName' => $person?->firstName ?? 'N/A',
+            'lastName' => $person?->lastName ?? 'N/A',
+            'employeeID' => $user?->id,
+            'branch' => $branch?->branchName ?? 'Sucursal no asignada',
+        ];
+
+        $ticketID = sprintf('TCK-%s', strtoupper(Str::random(10)));
+
         $ticketData = [
-            'ticketID' => $request->input('ticketID'),
+            'ticketID' => $ticketID,
             'items' => $request->input('items'),
-            'totalAmount' => $request->input('totalAmount'),
-            'cashier' => $request->input('cashier'), // Solo sera null si fue para recoger en tienda, sera hasta que coloque el producto en el gabinete
-            'customer' => $request->input('customer'), // Será null si no viene, se podra llenar si es producto del pedido en linea para recoger en tienda
-            'status' => 'Complete',
+            'totalAmount' => (float) $request->input('totalAmount'),
+            'cashier' => $cashierData,
+            'customer' => $request->input('customer'),
             'date' => now()
         ];
 

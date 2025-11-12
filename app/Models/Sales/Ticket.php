@@ -24,11 +24,7 @@ class Ticket extends Model
     ];
 
     protected $casts = [
-        'items' => 'array',
-        'cashier' => 'array',
-        'customer' => 'array',
         'totalAmount' => 'float',
-        'status' => 'string',
         'date' => 'datetime',
     ];
 }
