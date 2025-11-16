@@ -7,6 +7,7 @@ use App\Http\Controllers\Sales\SuppliersController;
 use App\Http\Controllers\Sales\ProductsController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\Sales\TicketController;
+use App\Http\Controllers\Users\GabineteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,3 +56,6 @@ Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(fun
     Route::get('/products', [ProductsController::class, 'getProducts']);
     Route::post('/purchaseInShop', [TicketController::class, 'purchaseInShop']);
 });
+
+// Endpoint que el SCRIPT DE PYTHON llama para dar el "aviso"
+Route::patch('/cabinet/notify-status/{ticketId}', [GabineteController::class, 'recibirNotificacionHardware']);

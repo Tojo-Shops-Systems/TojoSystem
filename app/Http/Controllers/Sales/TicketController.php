@@ -67,6 +67,7 @@ class TicketController extends Controller
             'totalAmount' => (float) $request->input('totalAmount'),
             'cashier' => $cashierData,
             'customer' => $request->input('customer'),
+            'status' => 'Complete',
             'date' => now()
         ];
 
@@ -78,4 +79,6 @@ class TicketController extends Controller
             'data' => $ticket
         ], 201);
     }
+
+    public function purchaseInWeb (Request $request){}
 }
