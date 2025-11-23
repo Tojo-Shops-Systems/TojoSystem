@@ -8,6 +8,8 @@ use App\Http\Controllers\Sales\ProductsController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\Sales\TicketController;
 use App\Http\Controllers\Users\GabineteController;
+use App\Http\Controllers\Users\CustomersController;
+use App\Http\Controllers\Users\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,18 +28,28 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 # Registro y logueo de usuarios de empleado o usuario
 Route::prefix('auth')->group(function () {
+    # Employee routes
     Route::post('/personalData', [AccountController::class, 'registerPerson']);
     Route::post('/register', [AccountController::class, 'register']);
     Route::post('/login', [AccountController::class, 'login']);
     Route::post('/identifyPerson', [AccountController::class, 'identifyPerson']);
+
+    # Customers routes
+    Route::post('/registerCustomer', [CustomersController::class, 'register']);
+    Route::post('/loginCustomer', [CustomersController::class, 'login']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AccountController::class, 'logout']);
     });
 });
 
+Route::get('/cloud/get-branch-by-key/{key}', [BranchController::class, 'getBranchByActivationKey']);
+Route::patch('/cloud/activate-branch-key/{id}', [BranchController::class, 'activateBranchKey']);
+Route::post('/register-branch-in-pi', [BranchController::class, 'registerBranchInPI']);
+
 # Just the CEO can do this
 Route::middleware(['auth:sanctum', 'verifyUserType:CEO,RH'])->group(function () {
+    Route::post('/cloud/create-branch', [BranchController::class, 'createCloudBranch']);
 });
 
 # Just the Boss can do this
@@ -55,6 +67,12 @@ Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(fun
     Route::post('/products/registerProduct', [ProductsController::class, 'registerProduct']);
     Route::get('/products', [ProductsController::class, 'getProducts']);
     Route::post('/purchaseInShop', [TicketController::class, 'purchaseInShop']);
+});
+
+
+# Just for customers
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/createOrders', [OrderController::class, 'store']);
 });
 
 // Endpoint que el SCRIPT DE PYTHON llama para dar el "aviso"

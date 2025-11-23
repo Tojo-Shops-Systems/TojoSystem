@@ -20,6 +20,7 @@ class Ticket extends Model
         'cashier',
         'customer',
         'status',
+        'branch_id',
         'date',
     ];
 

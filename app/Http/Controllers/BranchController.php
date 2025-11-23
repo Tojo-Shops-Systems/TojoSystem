@@ -8,51 +8,12 @@ use App\Models\Branch;
 use App\Models\User\User;
 use App\Models\User\Person;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use App\Models\BranchCloud;
+use Illuminate\Support\Str;
 
 class BranchController extends Controller
 {
-    public function createBranch(Request $request){
-        $existingBranch = Branch::first();
-
-        if ($existingBranch){
-            return response()->json([
-                'result' => false,
-                'msg' => 'Ya existe una sucursal registrada. Elimina la actual antes de crear una nueva'
-            ], 409);
-        }
-
-        $branchData = Validator::make($request->all(), [
-            'branchName' => 'required|string|max:50',
-            'address' => 'required|string|max:200'
-        ]);
-
-        if ($branchData->fails()){
-            return response()->json([
-                'result' => false,
-                'msg' => "Error de validacion.",
-                'data' => $branchData->errors()
-            ], 422);
-        }
-
-        $validated = $branchData->validated();
-
-        try {
-            $branch = Branch::create($validated);
-        }
-        catch (\Exception $e){
-            return response()->json([
-                'result' => false,
-                'msg' => 'Error interno al crear la sucursal.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-
-        return response()->json([
-            'result' => true,
-            'msg' => "Se creo correctamente la sucursal",
-        ], 201);
-    }
-
     public function assignBranch(Request $request)
     {
         $request->validate([
@@ -87,13 +48,178 @@ class BranchController extends Controller
         ], 200);
     }
 
-    public function getBranch (Request $request){
-        $branchData = Branch::all();
+    public function getBranchByActivationKey ($key){
+        $branchData = BranchCloud::where('activation_key', $key)->first();
+
+        if (!$branchData) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Llave de activación no válida.'
+            ], 404);
+        }
 
         return response()->json([
             'result' => true,
             'message' => 'Sucursal obtenida correctamente',
-            'data' => BranchResource::collection($branchData)
+            'data' => $branchData->id
         ], 200);
+    }
+
+    public function activateBranchKey($id){
+        if ($id == null) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error de validación.',
+            ], 422);
+        }
+
+        try {
+            $branch = BranchCloud::find($id);
+
+            if (!$branch) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'Sucursal no encontrada.'
+                ], 404);
+            }
+
+            if ($branch->is_active) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'La sucursal ya está activa.'
+                ], 400);
+            }
+
+            $branch->is_active = true;
+            $branch->save();
+
+            return response()->json([
+                'result' => true,
+                'message' => 'Sucursal activada correctamente.',
+                'data' => $branch
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error interno al activar la sucursal.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function createCloudBranch(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'branchName' => 'required|string|max:50',
+            'address' => 'required|string|max:200',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $lastBranch = BranchCloud::orderBy('branch_id', 'desc')->first();
+        $newBranchId = $lastBranch ? $lastBranch->branch_id + 1 : 10;
+
+        $activationKey = 'SUC-' . strtoupper(Str::random(6));
+
+        try {
+            $branch = BranchCloud::create([
+                'branch_id' => $newBranchId,
+                'branchName' => $request->branchName,
+                'address' => $request->address,
+                'activation_key' => $activationKey,
+                'is_active' => false,
+            ]);
+
+            return response()->json([
+                'result' => true,
+                'msg' => 'Sucursal creada en la Nube.',
+                'data' => [
+                    'branchName' => $branch->branchName,
+                    'branch_id' => $branch->branch_id,
+                    'activation_key' => $branch->activation_key
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function registerBranchInPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'activation_key' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error de validación.',
+                'data' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Verificar si ya existe una sucursal registrada
+            $existingBranch = Branch::first();
+            if ($existingBranch) {
+                return response()->json([
+                    'result' => false,
+                    'msg' => 'Ya existe una sucursal registrada. Elimina la actual antes de crear una nueva'
+                ], 409);
+            }
+
+            // 1. Llamar a la API para obtener el ID de la sucursal por la llave
+            $cloudApiBaseUrl = env('CLOUD_API_BASE_URL');
+            $cloudGetBranchResponse = env('CLOUD_GET_BRANCH_RESPONSE');
+            $cloudActivateBranchKey = env('CLOUD_ACTIVATE_BRANCH_KEY');
+            $getBranchResponse = Http::get("{$cloudApiBaseUrl}/{$cloudGetBranchResponse}/{$request->activation_key}");
+
+            if (!$getBranchResponse->successful() || !$getBranchResponse->json('result')) {
+                return response()->json([
+                    'result' => false,
+                    'msg' => 'Llave de activación no válida o sucursal no encontrada.',
+                    'error' => $getBranchResponse->json('message')
+                ], 404);
+            }
+
+            $branchId = $getBranchResponse->json('data');
+
+            // 2. Llamar a la API para activar la sucursal y obtener sus datos completos
+            $activateResponse = Http::patch("{$cloudApiBaseUrl}/{$cloudActivateBranchKey}/{$branchId}");
+
+
+            if (!$activateResponse->successful() || !$activateResponse->json('result')) {
+                return response()->json([
+                    'result' => false,
+                    'msg' => 'Error al activar la sucursal.',
+                    'error' => $activateResponse->json('message')
+                ], $activateResponse->status());
+            }
+
+            $branchData = $activateResponse->json('data');
+
+            // 3. Crear la sucursal localmente en el modelo Branch
+            $branch = Branch::create([
+                'id' => $branchData['branch_id'],
+                'branchName' => $branchData['branchName'],
+                'address' => $branchData['address'],
+            ]);
+
+            return response()->json([
+                'result' => true,
+                'msg' => 'Sucursal dada de alta exitosamente.',
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error interno al registrar la sucursal.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

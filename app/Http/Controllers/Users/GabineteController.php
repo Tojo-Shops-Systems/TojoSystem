@@ -19,4 +19,7 @@ class GabineteController extends Controller
         event(new GabineteStatusUpdated($ticketId, $status));
         return response()->json(['status' => 'aviso recibido']);
     }
+
+    public function getOrdersPending (Request $request){
+    }
 }
