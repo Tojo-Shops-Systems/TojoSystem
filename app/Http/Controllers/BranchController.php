@@ -18,8 +18,17 @@ class BranchController extends Controller
     {
         $request->validate([
             'curp' => 'required|string|exists:persons,CURP',
-            'branch_id' => 'required|exists:branches,id',
         ]);
+
+        // Obtener la sucursal registrada
+        $branch = Branch::first();
+
+        if (!$branch) {
+            return response()->json([
+                'result' => false,
+                'message' => 'No hay ninguna sucursal registrada en el sistema.'
+            ], 404);
+        }
 
         $person = Person::where('CURP', $request->curp)->first();
 
@@ -39,7 +48,7 @@ class BranchController extends Controller
             ], 404);
         }
 
-        $user->branch_id = $request->branch_id;
+        $user->branch_id = $branch->id;
         $user->save();
 
         return response()->json([
@@ -212,6 +221,7 @@ class BranchController extends Controller
             return response()->json([
                 'result' => true,
                 'msg' => 'Sucursal dada de alta exitosamente.',
+                'data' => $branch->id
             ], 201);
 
         } catch (\Exception $e) {
@@ -221,5 +231,24 @@ class BranchController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getBranchesData(Request $request){
+        $branchIds = $request->query('branch_ids');
+
+        if (!is_array($branchIds) || empty($branchIds)) {
+            return response()->json([
+                'result' => false,
+                'msg' => "branch_ids debe ser un arreglo de IDs."
+            ], 422);
+        }
+
+        $branches = BranchCloud::whereIn('branch_id', $branchIds)->get(['branch_id', 'branchName', 'address']);
+
+        return response()->json([
+            'result' => true,
+            'msg' => "Se obtuvo la información de las sucursales.",
+            'data' => $branches
+        ]);
     }
 }
