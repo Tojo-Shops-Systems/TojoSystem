@@ -7,15 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\Inventory\Product;
 use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\DomCrawler\Crawler;
 
 class ProductsController extends Controller
 {
     public function registerProduct(Request $request){
         $productData = Validator::make($request->all(), [
+            'code' => 'required|string|max:15',
             'name' => 'required|string|max:50',
+            'url_image' => 'required|string|max:255',
             'description' => 'required|string|max:200',
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0|max:999999.99',
+            'category_id' => 'nullable|integer',
             'supplier_id' => 'required|exists:suppliers,id'
         ]);
 
@@ -46,12 +50,98 @@ class ProductsController extends Controller
         ], 201);
     }
 
+    public function fastRegisterProduct(Request $request){
+        $data = Validator::make($request->all(), [
+            'code' => 'required|string|max:15',
+            'stock' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0|max:999999.99',
+            'supplier_id' => 'required|exists:suppliers,id'
+        ]);
+
+        if ($data->fails()){
+            return response()->json([
+                'result' => false,
+                'msg' => "Error de validacion.",
+                'data' => $data->errors()
+            ], 422);
+        }
+
+        $validated = $data->validated();
+
+        $url = env('GOUPC_URL') . $validated['code'];
+
+        $response = Http::get($url);
+
+        if ($response->failed()){
+            return response()->json([
+                'result' => false,
+                'msg' => "Error al obtener el producto.",
+                'data' => $response->json()
+            ], $response->status());
+        }
+
+        $crawler = new Crawler($response->body());
+
+        try {
+            $name = $crawler->filter('.name nobr')->count()
+                ? $crawler->filter('.name nobr')->text()
+                : null;
+
+            $description = $crawler->filter('.description p')->count()
+                ? $crawler->filter('.description p')->text()
+                : null;
+
+            $url_image = $crawler->filter('.product-image img')->count()
+                ? $crawler->filter('.product-image img')->attr('src')
+                : null;
+        }
+        catch (\Exception $e){
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error al interpretar datos del producto.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        if (!$name || !$url_image) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'No se encontró información del producto con este código.'
+            ], 404);
+        }
+
+        try {
+            $product = Product::create([
+                'code' => $validated['code'],
+                'name' => $name,
+                'description' => $description ?? 'Sin descripción',
+                'url_image' => $url_image,
+                'stock' => $validated['stock'],
+                'price' => $validated['price'],
+                'supplier_id' => $validated['supplier_id'],
+                'category_id' => $request->category_id ?? null
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error interno al agregar el producto.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+        return response()->json([
+            'result' => true,
+            'msg' => "Producto agregado correctamente",
+            'data' => $product
+        ], 201);
+    }
+
     public function getProducts(Request $request){
         # Query params
         $productID = $request->query('product_id');
         $supplierID = $request->query('supplier_id');
 
-        # With product param product_id: http://localhost:8000/api/products?product_id=1
+        # With product param product_id: http://localhost:8000/api/checkProductsExistence?product_id=1
         if ($productID){
             $product = Product::find($productID);
 
@@ -70,7 +160,7 @@ class ProductsController extends Controller
             ], 200);
         }
 
-        # With product param supplier_id: http://localhost:8000/api/products?supplier_id=1
+        # With product param supplier_id: http://localhost:8000/api/checkProductsExistence?supplier_id=1
         if ($supplierID){
             $products = Product::where('supplier_id', $supplierID)->get();
 
@@ -97,5 +187,37 @@ class ProductsController extends Controller
             'msg' => "Se trajeron todos los productos existentes",
             'data' => ProductResource::collection($products)
         ]);
+    }
+
+    public function productDeregister(Request $request){
+        $request->validate([
+            'id' => 'required|integer|exists:products,id'
+        ]);
+
+        $product = Product::find($request->id);
+
+        if (!$product) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'El producto no existe o ya fue eliminado.'
+            ], 404);
+        }
+
+        try {
+            $product->delete();
+
+            return response()->json([
+                'result' => true,
+                'msg' => 'El producto fue dado de baja correctamente.',
+                'deleted_id' => $request->id
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error interno al eliminar el producto.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

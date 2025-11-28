@@ -19,13 +19,12 @@ class Ticket extends Model
         'totalAmount',
         'cashier',
         'customer',
+        'status',
+        'branch_id',
         'date',
     ];
 
     protected $casts = [
-        'items' => 'array',
-        'cashier' => 'array',
-        'customer' => 'array',
         'totalAmount' => 'float',
         'date' => 'datetime',
     ];

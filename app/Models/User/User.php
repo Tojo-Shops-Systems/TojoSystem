@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\User\Person;
+use App\Models\Branch;
 
 class User extends Authenticatable
 {
@@ -48,5 +49,10 @@ class User extends Authenticatable
     public function person()
     {
         return $this->belongsTo(Person::class, 'person_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
     }
 }

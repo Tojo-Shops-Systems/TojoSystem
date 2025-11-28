@@ -10,9 +10,12 @@ class Branch extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'branchName',
         'address',
     ];
 
     protected $table = 'branches';
+
+    public $incrementing = false;
 }

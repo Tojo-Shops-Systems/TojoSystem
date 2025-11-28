@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User\User;
 use App\Models\User\Person;
+use App\Models\User\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\PersonResource;
@@ -24,6 +25,9 @@ class AccountController extends Controller
             "phoneNumber": "1234567890"
         }
         */
+        $cloudApiBaseUrl = env('CLOUD_API_BASE_URL');
+        $cloudRegisterPerson = env('CLOUD_REGISTER_PERSON');
+
         $validatedData = Validator::make($request->all(), [
             'firstName' => 'required|string|max:50',
             'lastName' => 'required|string|max:50',
@@ -67,11 +71,12 @@ class AccountController extends Controller
             "email": "jaret@email.com",
             "password": "J@ret1234",
             "password_confirmation": "J@ret1234",
+            "branch_id": 1 or nullable
             "person_id": 1
         }
         */
         $validator = Validator::make($request->all(), [
-            'userType' => 'required|string|max:15',
+            'userType' => 'nullable|string|max:15',
             'email' => 'required|string|email|unique:users,email',
             'password' => [
                 'required',
@@ -80,6 +85,7 @@ class AccountController extends Controller
                 'confirmed',
                 Password::min(8)->letters()->mixedCase()->numbers()->symbols()
             ],
+            'branch_id' => 'nullable|string|max:25',
             'person_id' => 'required|exists:persons,id'
         ]);
 
@@ -166,6 +172,54 @@ class AccountController extends Controller
     }
 
     public function identifyPerson(Request $request)
+    {
+        /* EXPECTED DATA
+        {
+            "CURP": "AAAA000000AAAAAAA0"
+        }
+        */
+        $validatedData = Validator::make($request->all(), [
+            'CURP' => 'required|string|max:18'
+        ]);
+
+        if ($validatedData->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => "Error de validación.",
+                'data' => $validatedData->errors()
+            ], 422);
+        }
+
+        $validated = $validatedData->validated();
+
+        try {
+            $person = Person::where('CURP', $validated['CURP'])->first();
+
+            if (!$person) {
+                return response()->json([
+                    'result' => false,
+                    'msg' => "No se encontró ninguna persona con esa CURP."
+                ], 404);
+            }
+
+            return response()->json([
+                'result' => true,
+                'msg' => "Persona identificada correctamente.",
+                'data' => [
+                    'id' => $person->id,
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'msg' => "Error interno del servidor.",
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function existsPersonInCloud(Request $request)
     {
         /* EXPECTED DATA
         {

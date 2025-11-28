@@ -5,33 +5,80 @@ namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sales\Ticket;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class TicketController extends Controller
 {
-    public function store(Request $request)
+    public function purchaseInShop(Request $request)
     {
-        $request->validate([
-            'ticketID' => 'required|string|unique:tickets,ticketID',
+        /* EXPECTED DATA
+        {
+            "items": [
+                {
+                    "name": "Coca de 600",
+                    "price": 22.00,
+                    "quantity": 50
+                },
+                {
+                    "name": "Chetos",
+                    "price": 20.00,
+                    "quantity": 1
+                }
+            ],
+            "totalAmount": 44.00,
+            "customer": null
+        }
+        */
+        $user = $request->user();
+
+        $purchaseInShop = Validator::make($request->all(), [
             'items' => 'required|array',
             'items.*.name' => 'required|string',
             'items.*.price' => 'required|numeric',
             'items.*.quantity' => 'required|integer',
             'totalAmount' => 'required|numeric',
-            'cashier' => 'nullable|array',
             'customer' => 'nullable|array',
         ]);
 
+        if ($purchaseInShop->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error de validación.',
+                'data' => $purchaseInShop->errors()
+            ], 422);
+        }
+
+        $person = $user->person;
+        $branch = $user->branch;
+
+        $cashierData = [
+            'firstName' => $person?->firstName ?? 'N/A',
+            'lastName' => $person?->lastName ?? 'N/A',
+            'employeeID' => $user?->id,
+            'branch' => $branch?->branchName ?? 'Sucursal no asignada',
+        ];
+
+        $ticketID = sprintf('TCK-%s', strtoupper(Str::random(10)));
+
         $ticketData = [
-            'ticketID' => $request->input('ticketID'),
+            'ticketID' => $ticketID,
             'items' => $request->input('items'),
-            'totalAmount' => $request->input('totalAmount'),
-            'cashier' => $request->input('cashier'), // Solo sera null si fue para recoger en tienda, sera hasta que coloque el producto en el gabinete
-            'customer' => $request->input('customer'), // Será null si no viene, se podra llenar si es producto del pedido en linea para recoger en tienda
+            'totalAmount' => (float) $request->input('totalAmount'),
+            'cashier' => $cashierData,
+            'customer' => $request->input('customer'),
+            'status' => 'Complete',
             'date' => now()
         ];
 
         $ticket = Ticket::create($ticketData);
 
-        return response()->json($ticket, 201);
+        return response()->json([
+            'result' => true,
+            'msg' => 'Ticket registrado con éxito',
+            'data' => $ticket
+        ], 201);
     }
+
+    public function purchaseInWeb (Request $request){}
 }
