@@ -54,6 +54,8 @@ Route::prefix('auth')->group(function () {
 
 Route::get('/cloud/get-branch-by-key/{key}', [BranchController::class, 'getBranchByActivationKey']);
 Route::patch('/cloud/activate-branch-key/{id}', [BranchController::class, 'activateBranchKey']);
+
+# La app de IOS solo hara esta api para registrar la sucursal en la base de datos local con la llave de activacion
 Route::post('/register-branch-in-pi', [BranchController::class, 'registerBranchInPI']);
 
 Route::post('/boss/productsExistence', [ProductsCloudController::class, 'checkProductsExistence']);
