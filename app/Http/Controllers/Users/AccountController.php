@@ -25,10 +25,14 @@ class AccountController extends Controller
             "phoneNumber": "1234567890"
         }
         */
-        $cloudApiBaseUrl = env('CLOUD_API_BASE_URL');
-        $cloudRegisterPerson = env('CLOUD_REGISTER_PERSON');
+        if ($request->id == null){
+            $request->merge([
+                'id' => rand(1, 1000000)
+            ]);
+        }
 
         $validatedData = Validator::make($request->all(), [
+            'id' => 'required|numeric',
             'firstName' => 'required|string|max:50',
             'lastName' => 'required|string|max:50',
             'CURP' => 'required|string|max:18',

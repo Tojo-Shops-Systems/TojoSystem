@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('auth')->group(function () {
     # Employee routes
     Route::post('/existsPersonInCloud', [AccountController::class, 'existsPersonInCloud']); # Solo es para verificar si el encargado ya existe en la nube
-    Route::post('/cloud/personalData', [AccountController::class, 'registerPerson']);
+    Route::post('/personalData', [AccountController::class, 'registerPerson']); #Con esta api registra sus datos personales en la nube
     # Este sera exclusivo para el registro local
     Route::post('/register', [AccountController::class, 'register']);
     # Cuando haga el registro local de la cuenta, esta se registrara igual en la nube
@@ -64,14 +64,16 @@ Route::get('/boss/getAllCategories', [ProductsCloudController::class, 'getAllCat
 # Just the CEO can do this
 Route::middleware(['auth:sanctum', 'verifyUserType:CEO,RH'])->group(function () {
     Route::post('/cloud/create-branch', [BranchController::class, 'createCloudBranch']);
+    Route::get('/cloud/getBranches', [BranchController::class, 'getBranches']);
     # El CEO o RH da de alta al encargado en la nube, y el encargado verificara su alta con la api /cloud/identifyPerson
-    Route::post('/boss/personalData', [AccountController::class, 'registerPerson']); # Solo es para registrar al encargado en la nube con datos personales
+    Route::post('/cloud/personalData', [AccountController::class, 'registerPerson']); # Solo es para registrar al encargado en la nube con datos personales
     Route::post('/cloud/register', [AccountController::class, 'register']); # Solo es para registrar al encargado en la nube con correo y contraseña
 });
 
 # Just the Boss can do this
 Route::middleware(['auth:sanctum', 'BossIdentify:Boss'])->group(function () {
     Route::post('/boss/createBranch', [BranchController::class, 'createBranch']);
+    Route::patch('/cloud/assignBranch', [BranchController::class, 'assignBranch']);
     Route::patch('/boss/assignBranch', [BranchController::class, 'assignBranch']);
     Route::get('/boss/getBranch', [BranchController::class, 'getBranch']);
     Route::delete('/boss/productDeregister', [ProductsController::class, 'productDeregister']);

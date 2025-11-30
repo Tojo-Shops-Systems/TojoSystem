@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\BranchResource;
+use App\Http\Resources\AdminBranchesResource;
 use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Models\User\User;
@@ -249,6 +250,15 @@ class BranchController extends Controller
             'result' => true,
             'msg' => "Se obtuvo la información de las sucursales.",
             'data' => $branches
+        ]);
+    }
+
+    public function getBranches(){
+        $branchesInAdmin = BranchCloud::where('is_active', true)->get();
+        return response()->json([
+            'result' => true,
+            'msg' => "Se obtuvo la información de las sucursales.",
+            'data' => AdminBranchesResource::collection($branchesInAdmin)
         ]);
     }
 }
