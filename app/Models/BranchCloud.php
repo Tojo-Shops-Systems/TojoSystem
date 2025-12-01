@@ -11,7 +11,7 @@ class BranchCloud extends Model
 
     protected $connection = 'mongodb';
 
-    protected $collection = 'branches_cloud';
+    protected $collection = 'branch_clouds';
 
     protected $fillable = [
         'branch_id',      // El ID numérico único (ej: 10) que usará la Pi
