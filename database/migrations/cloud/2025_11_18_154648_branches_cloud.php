@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('mongodb')->create('branches_cloud', function (Blueprint $table) {
+        Schema::connection('mongodb')->create('branch_clouds', function (Blueprint $table) {
             $table->unique('branch_id');
             $table->unique('activation_key');
             
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::connection('mongodb')->dropIfExists('branches_cloud');
+        Schema::connection('mongodb')->dropIfExists('branch_clouds');
     }
 };
