@@ -154,7 +154,7 @@ class AccountController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $isProduction = app()->environment('production');
-        $domain = $isProduction ? '.tojoshop.com' : null;
+        $domain = $isProduction ? '.tojosystemgroup.tech' : null;
         $secure = $isProduction;
 
         $cookie = cookie('token', $token, 60 * 24 * 7, '/', $domain, $secure, true, false, 'Lax');
