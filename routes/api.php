@@ -39,6 +39,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/cloud/register', [AccountController::class, 'register']);
     # Como solo se puede hacer ese registro en local, se ejecutara la api de la nube /auth/cloud/register para registrar al usuario en la nube
     Route::post('/login', [AccountController::class, 'login']);
+    Route::post('/loginPI', [AccountController::class, 'loginPI']);
     # Se identificara si los datos personales se encuentran en la nube o local
     Route::post('/cloud/identifyPerson', [AccountController::class, 'identifyPerson']);
     Route::post('/identifyPerson', [AccountController::class, 'identifyPerson']);

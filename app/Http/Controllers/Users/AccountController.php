@@ -274,4 +274,45 @@ class AccountController extends Controller
             ], 500);
         }
     }
+
+    public function loginPI(Request $request)
+    {
+        /* EXPECTED DATA
+        {
+            "email": "jaret1234@email.com",
+            "password": "J@ret1234"
+        }
+        */
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (!Auth::attempt($credentials, false)){
+            return response()->json([
+                'result' => false,
+                'msg' => "Credenciales incorrectas",
+            ], 401);
+        }
+
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'result' => false,
+                'msg' => "Credenciales incorrectas",
+            ], 401);
+        }
+
+        $person = Person::with('user')->findOrFail($user->person_id);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+        
+        return response()->json([
+            'result' => true,
+            'msg' => "Credenciales Correctas",
+            'user' => new PersonResource($person),
+            'token' => $token
+        ], 200);
+    }
 }
