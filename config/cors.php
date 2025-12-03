@@ -19,8 +19,12 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,https://www.tojoshop.com,https://tojoshop.com,https://admin.tojoshop.com,https://api.tojoshop.com
-')),
+    'allowed_origins' => [
+    'https://tojoshop.com',
+    'https://www.tojoshop.com',
+    'https://admin.tojoshop.com',
+    'https://api.tojoshop.com',
+],
 
     'allowed_origins_patterns' => [],
 
