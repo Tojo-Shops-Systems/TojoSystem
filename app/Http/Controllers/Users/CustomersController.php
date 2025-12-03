@@ -54,7 +54,7 @@ class CustomersController extends Controller
         $token = $customer->createToken('auth_token')->plainTextToken;
 
         $isProduction = app()->environment('production');
-        $domain = $isProduction ? '.tojosystemgroup.tech' : null;
+        $domain = $isProduction ? '.tojoshop.com' : null;
         $secure = $isProduction;
 
         $cookie = cookie('token', $token, 60 * 24 * 7, '/', $domain, $secure, true, false, 'None');
