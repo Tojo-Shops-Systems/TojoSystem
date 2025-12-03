@@ -157,7 +157,7 @@ class AccountController extends Controller
         $domain = $isProduction ? '.tojosystemgroup.tech' : null;
         $secure = $isProduction;
 
-        $cookie = cookie('token', $token, 60 * 24 * 7, '/', $domain, $secure, true, false, 'Lax');
+        $cookie = cookie('token', $token, 60 * 24 * 7, '/', $domain, $secure, true, false, 'None');
         
         return response()->json([
             'result' => true,
