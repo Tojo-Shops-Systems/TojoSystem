@@ -95,6 +95,14 @@ Route::middleware(['auth:sanctum', 'BossIdentify:Boss'])->group(function () {
     Route::post('/products/registerProductInCloud', [ProductsCloudController::class, 'registerProduct']);
     # APIs para alta de proveedores
     Route::post('/suppliers/register', [SuppliersController::class, 'registerSupplier']);
+
+    # APIs para alta de categorias en local
+    Route::post('/boss/createCategory', [ProductsController::class, 'createCategory']);
+    Route::get('/boss/getAllCategories', [ProductsController::class, 'getAllCategories']);
+
+    # APIs para alta de categorias en la nube
+    Route::post('/cloud/createCategory', [ProductsCloudController::class, 'createCategory']);
+    Route::get('/cloud/getAllCategories', [ProductsCloudController::class, 'getAllCategories']);
 });
 
 # Just for the employees on the shop
@@ -115,6 +123,7 @@ Route::get('/customers/products', [ProductsCloudController::class, 'getProducts'
 Route::get('/customers/getAllCategories', [ProductsCloudController::class, 'getAllCategories']);
 Route::get('/customers/getBranchHasSpecifyProduct', [ProductsCloudController::class, 'getBranchHasSpecifyProduct']);
 Route::get('/customers/getBranchesData', [BranchController::class, 'getBranchesData']);
+Route::get('/customers/getAllCategories', [ProductsCloudController::class, 'getAllCategories']);
 
 // Endpoint que el SCRIPT DE PYTHON llama para dar el "aviso"
 Route::patch('/cabinet/notify-status/{ticketId}', [GabineteController::class, 'recibirNotificacionHardware']);

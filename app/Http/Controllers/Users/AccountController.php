@@ -152,14 +152,18 @@ class AccountController extends Controller
         $person = Person::with('user')->findOrFail($user->person_id);
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        $isProduction = app()->environment('production');
+        $domain = $isProduction ? '.tojoshop.com' : null;
+        $secure = $isProduction;
+
+        $cookie = cookie('token', $token, 60 * 24 * 7, '/', $domain, $secure, true, false, 'Lax');
         
         return response()->json([
             'result' => true,
             'msg' => "Credenciales Correctas",
-            'access_token' => $token,
-            'token_type' => 'Bearer',
             'user' => new PersonResource($person)
-        ], 200);
+        ], 200)->withCookie($cookie);
     }
 
     public function logout(Request $request)

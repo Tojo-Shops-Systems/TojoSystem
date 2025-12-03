@@ -8,6 +8,7 @@ use App\Models\Inventory\Product;
 use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\DomCrawler\Crawler;
+use App\Models\Inventory\Categories;
 
 class ProductsController extends Controller
 {
@@ -219,5 +220,35 @@ class ProductsController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function createCategory(Request $request){
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'required|integer',
+            'category_name' => 'required|string|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error de validación',
+                'data' => $validator->errors()
+            ]);
+        }
+
+        $category = Categories::create($validator->validated());
+        return response()->json([
+            'result' => true,
+            'msg' => 'Categoria creada exitosamente',
+        ]);
+    }
+
+    public function getAllCategories(){
+        $categories = Categories::all();
+        return response()->json([
+            'result' => true,
+            'msg' => 'Categorias obtenidas exitosamente',
+            'data' => $categories
+        ]);
     }
 }

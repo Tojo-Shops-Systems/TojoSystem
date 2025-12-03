@@ -53,10 +53,11 @@ class CustomersController extends Controller
 
         $token = $customer->createToken('auth_token')->plainTextToken;
 
+        $cookie = cookie('token', $token, 60 * 24 * 7, '/', $domain, $secure, true, false, 'Lax');
+
         return response()->json([
             'message' => 'Inicio de sesión exitoso',
             'customer' => $customer,
-            'access_token' => $token,
-        ]);
+        ])->withCookie($cookie);
     }
 }

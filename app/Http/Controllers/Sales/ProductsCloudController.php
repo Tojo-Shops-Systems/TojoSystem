@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inventory\ProductCloud;
 use App\Models\Inventory\CategoriesCloud;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\ProductCloudResource;
+use App\Models\Inventory\BranchCloud;
 
 class ProductsCloudController extends Controller
 {
@@ -29,26 +31,16 @@ class ProductsCloudController extends Controller
         }
     }
 
-    public function getAllCategories()
-    {
-        $categories = CategoriesCloud::all();
-        return response()->json([
-            'result' => true,
-            'msg' => 'Categorias obtenidas exitosamente',
-            'data' => $categories
-        ]);
-    }
-
     public function registerProduct(Request $request){
         $validator = Validator::make($request->all(), [
             'product_code' => 'required|string|max:15',
             'product_name' => 'required|string|max:50',
             'product_url_image' => 'required|string|max:255',
-            'product_description' => 'required|string|max:200',
+            'product_description' => 'required|string|max:1000',
             'product_stock' => 'required|numeric|min:0',
             'product_price' => 'required|numeric|min:0',
-            'category_id' => 'nullable|exists:categories_cloud,id',
-            'branch_id' => 'required|exists:branches,id',
+            'category_id' => 'required|integer',
+            'branch_id' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -68,12 +60,12 @@ class ProductsCloudController extends Controller
 
     public function getProducts(Request $request){
         # Query params
-        $productID = $request->query('product_id');
+        $productCode = $request->query('product_code');
         $categoryID = $request->query('category_id');
 
-        # With product param product_id: http://localhost:8000/api/customers/products?product_id=1
-        if ($productID){
-            $product = ProductCloud::find($productID);
+        # With product param product_code: http://localhost:8000/api/customers/products?product_code=1
+        if ($productCode){
+            $product = ProductCloud::where('product_code', $productCode)->first(); # Solo toma el primer producto que coincida con el codigo
 
             if (!$product){
                 return response()->json([
@@ -86,7 +78,14 @@ class ProductsCloudController extends Controller
             return response()->json([
                 'result' => true,
                 'msg' => "Producto encontrado",
-                'data' => $product
+                'data' => [
+                    'product_code' => $product->product_code,
+                    'product_name' => $product->product_name,
+                    'product_url_image' => $product->product_url_image,
+                    'product_description' => $product->product_description,
+                    'product_price' => $product->product_price,
+                    'category_id' => $product->category_id,
+                ]
             ], 200);
         }
 
@@ -105,7 +104,7 @@ class ProductsCloudController extends Controller
             return response()->json([
                 'result' => true,
                 'msg' => "Productos encontrados",
-                'data' => $products
+                'data' => ProductCloudResource::collection($products)
             ], 200);
         }
 
@@ -115,7 +114,7 @@ class ProductsCloudController extends Controller
         return response()->json([
             'result' => true,
             'msg' => "Se trajeron todos los productos existentes",
-            'data' => $products
+            'data' => ProductCloudResource::collection($products)
         ]);
     }
 
@@ -129,5 +128,48 @@ class ProductsCloudController extends Controller
             'msg' => "Se trajeron todas las sucursales que tienen el producto",
             'data' => $branchesHasProduct
         ]);
+    }
+
+    public function createCategory(Request $request){
+        $validator = Validator::make($request->all(), [
+            'category_name' => 'required|string|max:50',
+        ]);
+
+        $category = CategoriesCloud::where('category_name', $request->category_name)->first();
+        if ($category) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'La categoria ya existe',
+                'data' => null
+            ], 409);
+        }
+
+        if ($validator->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Error de validación',
+                'data' => $validator->errors()
+            ]);
+        }
+
+        $category = CategoriesCloud::create($validator->validated());
+        return response()->json([
+            'result' => true,
+            'msg' => 'Categoria creada exitosamente',
+        ]);
+    }
+
+    public function getAllCategories(){
+        $categories = CategoriesCloud::all();
+        return response()->json([
+            'result' => true,
+            'msg' => 'Categorias obtenidas exitosamente',
+            'data' => $categories->map(function($category) {
+                return [
+                    'id' => $category->id,
+                    'category_name' => $category->category_name
+                ];
+            })
+        ], 200);
     }
 }
