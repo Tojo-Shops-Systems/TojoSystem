@@ -68,7 +68,6 @@ Route::middleware(['auth:sanctum', 'verifyUserType:CEO,RH'])->group(function () 
     Route::get('/cloud/getBranches', [BranchController::class, 'getBranches']);
     # El CEO o RH da de alta al encargado en la nube, y el encargado verificara su alta con la api /cloud/identifyPerson
     Route::post('/cloud/personalData', [AccountController::class, 'registerPerson']); # Solo es para registrar al encargado en la nube con datos personales
-    Route::post('/cloud/register', [AccountController::class, 'register']); # Solo es para registrar al encargado en la nube con correo y contraseña
 });
 
 # Just the Boss can do this
