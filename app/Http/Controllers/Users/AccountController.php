@@ -214,7 +214,7 @@ class AccountController extends Controller
                 'result' => true,
                 'msg' => "Persona identificada correctamente.",
                 'data' => [
-                    'id' => $person->id,
+                    'personData' => $person
                 ]
             ], 200);
 
