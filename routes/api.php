@@ -127,3 +127,6 @@ Route::get('/customers/getAllCategories', [ProductsCloudController::class, 'getA
 
 // Endpoint que el SCRIPT DE PYTHON llama para dar el "aviso"
 Route::patch('/cabinet/notify-status/{ticketId}', [GabineteController::class, 'recibirNotificacionHardware']);
+
+Route::post('/feedback/registerData', [FeedbackController::class, 'registerData']);
+Route::post('/feedback/registerDataInCloud', [FeedbackController::class, 'registerData']);
