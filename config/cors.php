@@ -23,7 +23,7 @@ return [
     'https://tojoshop.com',
     'https://www.tojoshop.com',
     'https://admin.tojoshop.com',
-    'https://api.tojoshop.com',
+    'https://tojosystemgroup.tech',
 ],
 
     'allowed_origins_patterns' => [],
