@@ -2,18 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-class FeedBack extends Model
+class FeedBack extends Eloquent
 {
-    use HasFactory;
-
     protected $table = 'feedback';
     protected $connection = 'mongodb';
 
     protected $fillable = [
-        'id',
         'data'
     ];
 }
