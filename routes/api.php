@@ -11,6 +11,7 @@ use App\Http\Controllers\Users\GabineteController;
 use App\Http\Controllers\Users\CustomersController;
 use App\Http\Controllers\Users\OrderController;
 use App\Http\Controllers\Sales\ProductsCloudController;
+use App\Http\Controllers\FeedbackController;
 
 /*
 |--------------------------------------------------------------------------
