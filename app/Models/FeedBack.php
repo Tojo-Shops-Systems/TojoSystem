@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use MongoDB\Laravel\Eloquent\Model;
 
-class FeedBack extends Eloquent
+class FeedBack extends Model
 {
     protected $table = 'feedback';
     protected $connection = 'mongodb';
