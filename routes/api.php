@@ -117,6 +117,7 @@ Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(fun
 # Just for customers
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/createOrders', [OrderController::class, 'store']);
+    Route::get('/logueado', [AccountController::class, 'logueado']);
 });
 
 # APIs generales para clientes o visitantes de la web

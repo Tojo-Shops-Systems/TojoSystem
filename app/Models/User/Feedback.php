@@ -15,14 +15,14 @@ class Feedback extends Model
 
     protected $fillable = [
         'feedbackID',
-        'sensorName',
+        'sensorType',
+        'sensorNumber',
         'data',
-        'date',
     ];
 
     protected $casts = [
-        'sensorName' => 'string',
-        'data' => 'array',
-        'date' => 'datetime',
+        'sensorType' => 'string',
+        'sensorNumber' => 'integer',
+        'data' => 'string',
     ];
 }

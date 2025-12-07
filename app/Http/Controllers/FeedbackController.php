@@ -10,6 +10,8 @@ class FeedbackController extends Controller
 {
     public function registerData(Request $request){
         $validator = Validator::make($request->all(), [
+            'sensorType' => 'required|string',
+            'sensorNumber' => 'required|integer',
             'data' => 'required|string'
         ]);
 
@@ -24,7 +26,11 @@ class FeedbackController extends Controller
         $validated = $validator->validated();
 
         try{
-            $feedback = FeedBack::create($validated);
+            $feedback = FeedBack::create([
+                'sensorType' => $validated['sensorType'],
+                'sensorNumber' => $validated['sensorNumber'],
+                'data' => $validated['data'],
+            ]);
         }
         catch (\Exception $e){
             return response()->json([

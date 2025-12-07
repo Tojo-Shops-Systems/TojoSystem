@@ -315,4 +315,11 @@ class AccountController extends Controller
             'token' => $token
         ], 200);
     }
+
+    public function logueado(){
+        return response()->json([
+            'result' => true,
+            'msg' => "Sesión iniciada correctamente."
+        ], 200);
+    }
 }
