@@ -251,4 +251,23 @@ class ProductsController extends Controller
             'data' => $categories
         ]);
     }
+
+    public function checkProductsExistence(Request $request)
+    {
+        $products = ProductCloud::whereIn('product_code', $request->product_codes)->get();
+        
+        if ($products->count() == $request->product_codes->count()) {
+            return response()->json([
+                'result' => true,
+                'msg' => 'Existe el producto',
+                'data' => $products
+            ]);
+        } else {
+            return response()->json([
+                'result' => false,
+                'msg' => 'No existe el producto',
+                'data' => null
+            ]);
+        }
+    }
 }

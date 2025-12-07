@@ -85,13 +85,13 @@ Route::middleware(['auth:sanctum', 'BossIdentify:Boss'])->group(function () {
 
     # APIS para alta de productos
     #Antes de registrar el producto, se debe verificar que no exista en la base de datos local
-    Route::post('/products/checkProductsExistence', [ProductsController::class, 'getProducts']);
+    Route::post('/products/checkProductsExistence', [ProductsController::class, 'checkProductsExistence']);
     # Luego si no esta local verifica en la nube
-    Route::post('/cloud/products/checkProductsExistence', [ProductsController::class, 'checkProductsExistence']);
+    Route::post('/cloud/products/checkProductsExistence', [ProductsCloudController::class, 'checkProductsExistence']);
     # Si no existe, se registrara el producto
     # En caso de que exista en la nube, se registrara el producto localmente al endpoint /products/registerProduct
     Route::post('/products/registerProduct', [ProductsController::class, 'registerProduct']);
-    Route::post('/products/fastRegisterProduct', [ProductsController::class, 'registerProduct']);
+    Route::post('/products/fastRegisterProduct', [ProductsController::class, 'fastRegisterProduct']);
     # Despues de agregar el producto, se agregara en la nube
     Route::post('/products/registerProductInCloud', [ProductsCloudController::class, 'registerProduct']);
     # APIs para alta de proveedores
