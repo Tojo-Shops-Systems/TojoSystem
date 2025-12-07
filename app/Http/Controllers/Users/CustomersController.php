@@ -64,4 +64,12 @@ class CustomersController extends Controller
             'customer' => $customer,
         ])->withCookie($cookie);
     }
+
+    public function userData(Request $request){
+        return response()->json([
+            'result' => true,
+            'msg' => "Sesión iniciada correctamente.",
+            'user' => $request->user()
+        ], 200);
+    }
 }

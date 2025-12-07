@@ -111,6 +111,7 @@ Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(fun
     Route::get('/suppliers/{id?}', [SuppliersController::class, 'getSuppliers']);
     Route::get('/products', [ProductsController::class, 'getProducts']);
     Route::post('/purchaseInShop', [TicketController::class, 'purchaseInShop']);
+    Route::get('/customer/userData', [CustomersController::class, 'userData']);
 });
 
 
@@ -118,6 +119,7 @@ Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(fun
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/createOrders', [OrderController::class, 'store']);
     Route::get('/logueado', [AccountController::class, 'logueado']);
+    Route::get('/customer/userData', [CustomersController::class, 'userData']);
 });
 
 # APIs generales para clientes o visitantes de la web
