@@ -9,6 +9,7 @@ use App\Models\Inventory\CategoriesCloud;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ProductCloudResource;
 use App\Models\Inventory\BranchCloud;
+use App\Models\User\Cart;
 
 class ProductsCloudController extends Controller
 {
@@ -181,6 +182,61 @@ class ProductsCloudController extends Controller
                     'category_name' => $category->category_name
                 ];
             })
+        ], 200);
+    }
+
+    public function getCart(Request $request){
+        $cart = Cart::where('customer_id', $request->customer_id)->first();
+        return response()->json([
+            'result' => true,
+            'msg' => 'Carrito obtenido exitosamente',
+            'data' => $cart
+        ], 200);
+    }
+
+    public function addProductToCart(Request $request){
+        $cart = Cart::where('customer_id', $request->customer_id)->first();
+        if ($cart) {
+            $cart->items()->attach($request->product_id);
+            return response()->json([
+                'result' => true,
+                'msg' => 'Producto agregado al carrito exitosamente',
+                'data' => $cart
+            ], 200);
+        }
+        return response()->json([
+            'result' => false,
+            'msg' => 'Carrito no encontrado',
+            'data' => null
+        ], 404);
+    }
+
+    public function removeProductFromCart(Request $request){
+        $cart = Cart::where('customer_id', $request->customer_id)->first();
+        if ($cart) {
+            $cart->items()->detach($request->product_id);
+            return response()->json([
+                'result' => true,
+                'msg' => 'Producto removido del carrito exitosamente',
+                'data' => $cart
+            ], 200);
+        }
+        return response()->json([
+            'result' => false,
+            'msg' => 'Carrito no encontrado',
+            'data' => null
+        ], 404);
+    }
+
+    public function createCart(Request $request){
+        $cart = Cart::create([
+            'customer_id' => $request->customer_id,
+            'items' => $request->items,
+        ]);
+        return response()->json([
+            'result' => true,
+            'msg' => 'Carrito creado exitosamente',
+            'data' => $cart
         ], 200);
     }
 }

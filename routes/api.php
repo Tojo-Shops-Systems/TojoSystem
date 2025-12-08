@@ -121,6 +121,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/createOrders', [OrderController::class, 'store']);
     Route::get('/logueado', [AccountController::class, 'logueado']);
     Route::get('/customer/userData', [CustomersController::class, 'userData']);
+
+    #carrito
+    Route::post('/cart/createCart', [ProductsCloudController::class, 'createCart']);
+    Route::post('/cart/addProductToCart', [ProductsCloudController::class, 'addProductToCart']);
+    Route::post('/cart/removeProductFromCart', [ProductsCloudController::class, 'removeProductFromCart']);
+    Route::get('/cart/getCart', [ProductsCloudController::class, 'getCart']);
 });
 
 # APIs generales para clientes o visitantes de la web
