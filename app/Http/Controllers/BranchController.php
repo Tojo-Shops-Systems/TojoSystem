@@ -263,7 +263,7 @@ class BranchController extends Controller
     }
 
     public function getBranchesLocal(){
-        $branchesInAdmin = Branch::where('is_active', true)->get();
+        $branchesInAdmin = Branch::get();
         return response()->json([
             'result' => true,
             'msg' => "Se obtuvo la información de las sucursales.",
