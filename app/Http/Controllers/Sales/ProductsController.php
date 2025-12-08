@@ -255,7 +255,7 @@ class ProductsController extends Controller
 
     public function checkProductsExistence(Request $request)
     {
-        $products = ProductCloud::whereIn('product_code', $request->product_codes)->get();
+        $products = Product::whereIn('product_code', $request->product_codes)->get();
         
         if ($products->count() == $request->product_codes->count()) {
             return response()->json([
