@@ -39,7 +39,7 @@ class ProductsCloudController extends Controller
             'product_description' => 'required|string|max:1000',
             'product_stock' => 'required|numeric|min:0',
             'product_price' => 'required|numeric|min:0',
-            'category_id' => 'required|string|max:20',
+            'category_id' => 'required|string|max:50',
             'branch_id' => 'required|integer',
         ]);
 
