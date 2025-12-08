@@ -132,6 +132,7 @@ class ProductsCloudController extends Controller
 
     public function createCategory(Request $request){
         $validator = Validator::make($request->all(), [
+            'category_id' => 'required|string|max:50',
             'category_name' => 'required|string|max:50',
         ]);
 
