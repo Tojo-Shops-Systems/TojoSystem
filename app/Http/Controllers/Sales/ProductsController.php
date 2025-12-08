@@ -9,6 +9,7 @@ use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\DomCrawler\Crawler;
 use App\Models\Inventory\Categories;
+use Illuminate\Support\Facades\Http;
 
 class ProductsController extends Controller
 {
