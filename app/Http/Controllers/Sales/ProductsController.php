@@ -255,29 +255,29 @@ class ProductsController extends Controller
 
     public function checkProductsExistence(Request $request)
     {
-        $productCodes = $request->input('product_codes');
+        $productCode = $request->input('product_code');
 
-        if (!is_array($productCodes) || empty($productCodes)) {
+        if (!$productCode) {
             return response()->json([
                 'result' => false,
-                'msg' => 'No se proporcionaron códigos de producto válidos.',
+                'msg' => 'No se proporcionó un código de producto válido.',
                 'data' => null
             ], 400);
         }
 
-        $products = Product::whereIn('code', $productCodes)->get();
+        $product = Product::where('code', $productCode)->first();
         
-        if ($products->count() === count($productCodes)) {
+        if ($product) {
             return response()->json([
                 'result' => true,
-                'msg' => 'Todos los productos existen',
-                'data' => $products
+                'msg' => 'Existe el producto',
+                'data' => $product
             ]);
         } else {
             return response()->json([
                 'result' => false,
-                'msg' => 'Algunos productos no existen',
-                'data' => null // You might want to return which ones are missing, but following existing logic for now.
+                'msg' => 'No existe el producto',
+                'data' => null
             ]);
         }
     }
