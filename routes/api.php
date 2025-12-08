@@ -112,6 +112,7 @@ Route::middleware('auth:sanctum', 'ExclusiveEmployees:Boss,Employee')->group(fun
     Route::get('/products', [ProductsController::class, 'getProducts']);
     Route::post('/purchaseInShop', [TicketController::class, 'purchaseInShop']);
     Route::get('/customer/userData', [CustomersController::class, 'userData']);
+    Route::get('/local/getBranches', [BranchController::class, 'getBranches']);
 });
 
 
