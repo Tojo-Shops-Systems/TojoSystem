@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->unsignedInteger('stock');
             $table->decimal('price', 10, 2);
-            $table->integer('category_id');
+            $table->string('category_id', 50);
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
             $table->timestamps();
         });
