@@ -177,7 +177,7 @@ class ProductsCloudController extends Controller
             'msg' => 'Categorias obtenidas exitosamente',
             'data' => $categories->map(function($category) {
                 return [
-                    'id' => $category->category_id,
+                    'id' => $category->id,
                     'category_name' => $category->category_name
                 ];
             })
