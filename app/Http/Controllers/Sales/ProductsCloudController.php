@@ -14,13 +14,23 @@ class ProductsCloudController extends Controller
 {
     public function checkProductsExistence(Request $request)
     {
-        $products = ProductCloud::whereIn('product_code', $request->product_codes)->get();
+        $productCode = $request->input('product_code');
+
+        if (!$productCode) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'No se proporcionó un código de producto válido.',
+                'data' => null
+            ], 400);
+        }
+
+        $product = ProductCloud::where('product_code', $productCode)->first();
         
-        if ($products->count() == $request->product_codes->count()) {
+        if ($product) {
             return response()->json([
                 'result' => true,
                 'msg' => 'Existe el producto',
-                'data' => $products
+                'data' => $product
             ]);
         } else {
             return response()->json([
