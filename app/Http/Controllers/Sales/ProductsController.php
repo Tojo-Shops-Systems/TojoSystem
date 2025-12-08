@@ -21,7 +21,7 @@ class ProductsController extends Controller
             'description' => 'required|string|max:200',
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0|max:999999.99',
-            'category_id' => 'nullable|integer',
+            'category_id' => 'nullable|string|max:20',
             'supplier_id' => 'required|exists:suppliers,id'
         ]);
 
