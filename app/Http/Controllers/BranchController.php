@@ -261,4 +261,13 @@ class BranchController extends Controller
             'data' => AdminBranchesResource::collection($branchesInAdmin)
         ]);
     }
+
+    public function getBranchesLocal(){
+        $branchesInAdmin = Branch::where('is_active', true)->get();
+        return response()->json([
+            'result' => true,
+            'msg' => "Se obtuvo la información de las sucursales.",
+            'data' => $branchesInAdmin
+        ]);
+    }
 }
