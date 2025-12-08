@@ -195,19 +195,18 @@ class ProductsCloudController extends Controller
     }
 
     public function addProductToCart(Request $request){
-    // Automatically find or create the cart
-        $cart = Cart::firstOrCreate(['customer_id' => $request->customer_id]);
-    
-        // Then attach the product
-        $cart->items()->attach($request->product_id);
-    
-        return response()->json([
-            'result' => true, 
-            'msg' => 'Producto agregado al carrito exitosamente', 
-            'data' => $cart
-        ], 200);
+        $cart = Cart::where('customer_id', $request->customer_id)->first();
+        if ($cart) {
+            // Add item to array (simplified logic)
+            $items = $cart->items ?? [];
+            $items[] = ['product_id' => $request->product_id, 'quantity' => 1];
+            $cart->items = $items;
+            $cart->save();
+        
+            return response()->json(['result' => true, 'msg' => 'Agregado', 'data' => $cart]);
+        }
     }
-
+    
     public function removeProductFromCart(Request $request){
         $cart = Cart::where('customer_id', $request->customer_id)->first();
         if ($cart) {
