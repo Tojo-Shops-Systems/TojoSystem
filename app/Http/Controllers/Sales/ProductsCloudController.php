@@ -207,19 +207,30 @@ class ProductsCloudController extends Controller
     }
 
     public function addProductToCart(Request $request){
-        // FIX: Access parameter
-        $userId = $request->customer_id;
+        // Usar customer_id como acordamos
+        $userId = $request->customer_id; 
     
         $cart = Cart::where('customer', $userId)->first();
         if ($cart) {
             $items = $cart->items ?? [];
-            $items[] = ['product_id' => $request->product_id, 'quantity' => 1];
+            
+            // Verificar si el producto ya existe para actualizar cantidad (Opcional, pero recomendado)
+            // Si solo quieres agregar items nuevos cada vez:
+            
+            $items[] = [
+                'product_id' => $request->product_id,
+                'quantity' => 1,
+                // GUARDAR LOS DATOS EXTRAS AQUI:
+                'name' => $request->product_name,
+                'price' => $request->product_price,
+                'image' => $request->product_image
+            ];
+            
             $cart->items = $items;
             $cart->save();
     
             return response()->json(['result' => true, 'msg' => 'Agregado', 'data' => $cart]);
         }
-        // Don't forget to handle "Cart not found" case here too!
         return response()->json(['result' => false, 'msg' => 'Carrito no encontrado', 'data' => null], 404);
     }
     
