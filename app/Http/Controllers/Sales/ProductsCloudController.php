@@ -187,9 +187,9 @@ class ProductsCloudController extends Controller
         ], 200);
     }
 
-    public function getCart($params){
+    public function getCart(Request $request){
         // IMPORTANTE: (int) fuerza a que sea un número
-        $userId = (int) $params->customer_id;
+        $userId = (int) $request->query('customer_id');
     
         // Debug opcional: verifica qué estás buscando
         // \Log::info("Buscando carrito para customer: " . $userId . " tipo: " . gettype($userId));
