@@ -323,10 +323,28 @@ class AccountController extends Controller
         ], 200);
     }
 
-    public function userEmployee(Request $request){
-        $userId = $request;
+    public function userEmployee(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric'
+        ]);
 
-        $user = Person::where('id', $userId)->first();
+        if ($validator->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'ID de usuario requerido.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = Person::where('id', $request->input('id'))->first();
+
+        if (!$user) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Usuario no encontrado.'
+            ], 404);
+        }
 
         return response()->json([
             'result' => true,
