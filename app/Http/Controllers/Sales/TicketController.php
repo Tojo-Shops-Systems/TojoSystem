@@ -144,8 +144,10 @@ class TicketController extends Controller
 
         // Notification to external API
         try {
+            $targetId = (string) $branchId;
+
             Http::post('http://142.93.28.165:3000/api/notify', [
-                'targetId' => $branchId,
+                'targetId' => $targetId,
                 'data' => [
                     'msg' => $ticket,
                     'total' => $ticket->totalAmount
