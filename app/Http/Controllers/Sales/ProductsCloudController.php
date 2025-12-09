@@ -263,7 +263,7 @@ class ProductsCloudController extends Controller
             ], 409);
         }
         $cart = Cart::create([
-            'customer_id' => $user->id,
+            'customer' => $user->id,
             'items' => $request->items,
         ]);
     
