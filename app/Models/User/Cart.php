@@ -21,8 +21,6 @@ class Cart extends Model
     ];
 
     protected $casts = [
-        'items' => 'array',
-        'customer' => 'array',
         'date' => 'datetime',
     ];
 }
