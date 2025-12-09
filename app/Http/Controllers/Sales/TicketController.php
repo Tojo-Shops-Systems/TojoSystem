@@ -164,4 +164,46 @@ class TicketController extends Controller
             'data' => $ticket
         ], 201);
     }
+
+    public function updateTicketStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ticket_id' => 'required',
+            'status' => 'required|string',
+            'cashier' => 'required|array',
+            'branch_id' => 'nullable'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Datos incompletos para actualizar el ticket.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $ticket = Ticket::where('ticketID', $request->ticket_id)->first();
+
+        if (!$ticket) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Ticket no encontrado.'
+            ], 404);
+        }
+
+        $ticket->status = $request->input('status');
+        $ticket->cashier = $request->input('cashier');
+
+        if ($request->has('branch_id')) {
+            $ticket->branch_id = $request->input('branch_id');
+        }
+
+        $ticket->save();
+
+        return response()->json([
+            'result' => true,
+            'msg' => 'Ticket actualizado correctamente.',
+            'data' => $ticket
+        ], 200);
+    }
 }

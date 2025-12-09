@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('/userEmployee', [AccountController::class, 'userEmployee']);
+
 # Registro y logueo de usuarios de empleado o usuario
 Route::prefix('auth')->group(function () {
     # Employee routes
@@ -131,6 +133,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cart/removeProductFromCart', [ProductsCloudController::class, 'removeProductFromCart']);
     Route::get('/cart/getCart', [ProductsCloudController::class, 'getCart']);
     Route::post('/cart/purchaseInWeb', [TicketController::class, 'purchaseInWeb']);
+    Route::post('/ticket/updateStatus', [TicketController::class, 'updateTicketStatus']);
 });
 
 # APIs generales para clientes o visitantes de la web

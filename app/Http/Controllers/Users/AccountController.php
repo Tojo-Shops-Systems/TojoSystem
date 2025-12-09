@@ -322,4 +322,16 @@ class AccountController extends Controller
             'msg' => "Sesión iniciada correctamente."
         ], 200);
     }
+
+    public function userEmployee(Request $request){
+        $userId = $request->user()->id;
+
+        $user = Person::where('id', $userId)->first();
+
+        return response()->json([
+            'result' => true,
+            'msg' => "Usuario encontrado correctamente.",
+            'user' => $user
+        ], 200);
+    }
 }
