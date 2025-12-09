@@ -270,16 +270,19 @@ class ProductsCloudController extends Controller
     }
 
     private function getCustomerId(Request $request) {
-        $userId = auth()->id();
-        if ($userId) {
-            return $userId;
+        $user = $request->user();
+        if ($user) {
+            return $user->id;
         }
 
         $token = $request->cookie('token');
         if ($token) {
             $accessToken = PersonalAccessToken::findToken($token);
-            if ($accessToken && $accessToken->tokenable_type === 'App\Models\User\Customer') {
-                return $accessToken->tokenable_id;
+            if ($accessToken) {
+                $user = $accessToken->tokenable;
+                if ($user instanceof \App\Models\User\Customer) {
+                    return $user->id;
+                }
             }
         }
         return null;
