@@ -191,7 +191,7 @@ class ProductsCloudController extends Controller
         // FIX: Access parameter (works for GET query params too)
         $userId = $request->customer_id;
     
-        $cart = Cart::where('customer_id', $userId)->first();
+        $cart = Cart::where('customer', $userId)->first();
         if (!$cart) {
             return response()->json([
                 'result' => false,
@@ -210,7 +210,7 @@ class ProductsCloudController extends Controller
         // FIX: Access parameter
         $userId = $request->customer_id;
     
-        $cart = Cart::where('customer_id', $userId)->first();
+        $cart = Cart::where('customer', $userId)->first();
         if ($cart) {
             $items = $cart->items ?? [];
             $items[] = ['product_id' => $request->product_id, 'quantity' => 1];
@@ -227,7 +227,7 @@ class ProductsCloudController extends Controller
         // FIX: Access parameter
         $userId = $request->customer_id;
     
-        $cart = Cart::where('customer_id', $userId)->first();
+        $cart = Cart::where('customer', $userId)->first();
         if ($cart) {
             $cart->items()->detach($request->product_id); // Ensure this works for your MongoDB model
             return response()->json([
@@ -254,7 +254,7 @@ class ProductsCloudController extends Controller
                 'data' => null
             ], 404);
         }
-        $cart = Cart::where('customer_id', $user->id)->first();
+        $cart = Cart::where('customer', $user->id)->first();
         if ($cart) {
             return response()->json([
                 'result' => false,
