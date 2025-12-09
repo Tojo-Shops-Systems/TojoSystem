@@ -324,7 +324,7 @@ class AccountController extends Controller
     }
 
     public function userEmployee(Request $request){
-        $userId = $request->user()->id;
+        $userId = $request;
 
         $user = Person::where('id', $userId)->first();
 
