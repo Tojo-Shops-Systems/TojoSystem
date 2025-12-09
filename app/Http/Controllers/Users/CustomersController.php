@@ -72,4 +72,28 @@ class CustomersController extends Controller
             'user' => $request->user()
         ], 200);
     }
+
+    public function loginCloudPruebas(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $customer = Customer::where('email', $request->email)->first();
+
+        if (! $customer || ! Hash::check($request->password, $customer->password)) {
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        }
+
+        $token = $customer->createToken('auth_token')->plainTextToken;
+        
+        return response()->json([
+            'message' => 'Inicio de sesión exitoso',
+            'customer' => $token,
+        ]);
+    }
 }

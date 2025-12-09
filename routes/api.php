@@ -48,6 +48,9 @@ Route::prefix('auth')->group(function () {
     # Customers routes
     Route::post('/registerCustomer', [CustomersController::class, 'register']);
     Route::post('/loginCustomer', [CustomersController::class, 'login']);
+
+    Route::post('/loginCloudPruebas', [CustomersController::class, 'loginCloudPruebas']);
+    
     
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AccountController::class, 'logout']);

@@ -188,7 +188,7 @@ class ProductsCloudController extends Controller
     }
 
     public function getCart(Request $request){
-        $userId = $this->getCustomerId($request);
+        $userId = $request;
         $cart = Cart::where('customer_id', $userId)->first();
         if (!$cart) {
             return response()->json([
@@ -205,7 +205,7 @@ class ProductsCloudController extends Controller
     }
 
     public function addProductToCart(Request $request){
-        $userId = $this->getCustomerId($request);
+        $userId = $request;
         $cart = Cart::where('customer_id', $userId)->first();
         if ($cart) {
             // Add item to array (simplified logic)
@@ -219,7 +219,7 @@ class ProductsCloudController extends Controller
     }
     
     public function removeProductFromCart(Request $request){
-        $userId = $this->getCustomerId($request);
+        $userId = $request;
         $cart = Cart::where('customer_id', $userId)->first();
         if ($cart) {
             $cart->items()->detach($request->product_id);
@@ -237,7 +237,7 @@ class ProductsCloudController extends Controller
     }
 
     public function createCart(Request $request){
-        $userId = $this->getCustomerId($request);
+        $userId = $request;
 
         $user = Customer::where('id', $userId)->first();
         if (!$user) {
@@ -267,24 +267,5 @@ class ProductsCloudController extends Controller
             'msg' => 'Carrito creado exitosamente',
             'data' => $cart
         ], 200);
-    }
-
-    private function getCustomerId(Request $request) {
-        $user = $request->user();
-        if ($user) {
-            return $user->id;
-        }
-
-        $token = $request->cookie('token');
-        if ($token) {
-            $accessToken = PersonalAccessToken::findToken($token);
-            if ($accessToken) {
-                $user = $accessToken->tokenable;
-                if ($user instanceof \App\Models\User\Customer) {
-                    return $user->id;
-                }
-            }
-        }
-        return null;
     }
 }
