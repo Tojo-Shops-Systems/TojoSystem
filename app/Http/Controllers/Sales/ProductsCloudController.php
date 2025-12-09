@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ProductCloudResource;
 use App\Models\Inventory\BranchCloud;
 use App\Models\User\Cart;
+use App\Models\User\Customer;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class ProductsCloudController extends Controller
 {
@@ -185,9 +187,9 @@ class ProductsCloudController extends Controller
         ], 200);
     }
 
-    public function getCart(){
-
-        $cart = Cart::where('customer_id', auth()->id())->first();
+    public function getCart(Request $request){
+        $userId = $this->getCustomerId($request);
+        $cart = Cart::where('customer_id', $userId)->first();
         if (!$cart) {
             return response()->json([
                 'result' => false,
@@ -203,7 +205,8 @@ class ProductsCloudController extends Controller
     }
 
     public function addProductToCart(Request $request){
-        $cart = Cart::where('customer_id', auth()->id())->first();
+        $userId = $this->getCustomerId($request);
+        $cart = Cart::where('customer_id', $userId)->first();
         if ($cart) {
             // Add item to array (simplified logic)
             $items = $cart->items ?? [];
@@ -216,7 +219,8 @@ class ProductsCloudController extends Controller
     }
     
     public function removeProductFromCart(Request $request){
-        $cart = Cart::where('customer_id', auth()->id())->first();
+        $userId = $this->getCustomerId($request);
+        $cart = Cart::where('customer_id', $userId)->first();
         if ($cart) {
             $cart->items()->detach($request->product_id);
             return response()->json([
@@ -233,7 +237,18 @@ class ProductsCloudController extends Controller
     }
 
     public function createCart(Request $request){
-        $cart = Cart::where('customer_id', auth()->id())->first();
+        $userId = $this->getCustomerId($request);
+
+        $user = Customer::where('id', $userId)->first();
+        if (!$user) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Usuario no encontrado',
+                'data' => null
+            ], 404);
+        }
+
+        $cart = Cart::where('customer_id', $user->id)->first();
         if ($cart) {
             return response()->json([
                 'result' => false,
@@ -241,14 +256,32 @@ class ProductsCloudController extends Controller
                 'data' => null
             ], 409);
         }
+
         $cart = Cart::create([
-            'customer_id' => auth()->id(),
+            'customer_id' => $user->id,
             'items' => $request->items,
         ]);
+        
         return response()->json([
             'result' => true,
             'msg' => 'Carrito creado exitosamente',
             'data' => $cart
         ], 200);
+    }
+
+    private function getCustomerId(Request $request) {
+        $userId = auth()->id();
+        if ($userId) {
+            return $userId;
+        }
+
+        $token = $request->cookie('token');
+        if ($token) {
+            $accessToken = PersonalAccessToken::findToken($token);
+            if ($accessToken && $accessToken->tokenable_type === 'App\Models\User\Customer') {
+                return $accessToken->tokenable_id;
+            }
+        }
+        return null;
     }
 }
