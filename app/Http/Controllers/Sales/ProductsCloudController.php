@@ -188,10 +188,13 @@ class ProductsCloudController extends Controller
     }
 
     public function getCart(Request $request){
-        // FIX: Access parameter (works for GET query params too)
-        $userId = $request->customer_id;
+        // IMPORTANTE: (int) fuerza a que sea un número
+        $userId = (int) $request->customer_id;
     
+        // Debug opcional: verifica qué estás buscando
+        // \Log::info("Buscando carrito para customer: " . $userId . " tipo: " . gettype($userId));
         $cart = Cart::where('customer', $userId)->first();
+    
         if (!$cart) {
             return response()->json([
                 'result' => false,
@@ -207,51 +210,52 @@ class ProductsCloudController extends Controller
     }
 
     public function addProductToCart(Request $request){
-        // Usar customer_id como acordamos
-        $userId = $request->customer_id; 
+    // IMPORTANTE: (int) fuerza a que sea un número
+        $userId = (int) $request->customer_id; 
     
         $cart = Cart::where('customer', $userId)->first();
+    
         if ($cart) {
             $items = $cart->items ?? [];
-            
-            // Verificar si el producto ya existe para actualizar cantidad (Opcional, pero recomendado)
-            // Si solo quieres agregar items nuevos cada vez:
-            
+        
             $items[] = [
                 'product_id' => $request->product_id,
                 'quantity' => 1,
-                // GUARDAR LOS DATOS EXTRAS AQUI:
                 'name' => $request->product_name,
                 'price' => $request->product_price,
                 'image' => $request->product_image
             ];
-            
+        
             $cart->items = $items;
             $cart->save();
-    
-            return response()->json(['result' => true, 'msg' => 'Agregado', 'data' => $cart]);
-        }
-        return response()->json(['result' => false, 'msg' => 'Carrito no encontrado', 'data' => null], 404);
-    }
-    
-    public function removeProductFromCart(Request $request){
-        // FIX: Access parameter
-        $userId = $request->customer_id;
-    
-        $cart = Cart::where('customer', $userId)->first();
-        if ($cart) {
-            $cart->items()->detach($request->product_id); // Ensure this works for your MongoDB model
             return response()->json([
-                'result' => true,
-                'msg' => 'Producto removido del carrito exitosamente',
+                'result' => true, 
+                'msg' => 'Producto agregado al carrito exitosamente', 
                 'data' => $cart
             ], 200);
         }
+    
         return response()->json([
-            'result' => false,
-            'msg' => 'Carrito no encontrado',
+            'result' => false, 
+            'msg' => 'Carrito no encontrado para customer: ' . $userId, 
             'data' => null
         ], 404);
+    }
+    
+    public function removeProductFromCart(Request $request){
+        // IMPORTANTE: (int) fuerza a que sea un número
+        $userId = (int) $request->customer_id; 
+    
+        $cart = Cart::where('customer', $userId)->first();
+        if ($cart) {
+            $cart->items()->detach($request->product_id);
+            return response()->json([
+                'result' => true,
+                'msg' => 'Producto removido',
+                'data' => $cart
+            ], 200);
+        }
+        return response()->json(['result' => false, 'msg' => 'Carrito no encontrado', 'data' => null], 404);
     }
 
     public function createCart(Request $request){
