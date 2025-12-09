@@ -235,16 +235,7 @@ class BranchController extends Controller
     }
 
     public function getBranchesData(Request $request){
-        $branchIds = $request->query('branch_ids');
-
-        if (!is_array($branchIds) || empty($branchIds)) {
-            return response()->json([
-                'result' => false,
-                'msg' => "branch_ids debe ser un arreglo de IDs."
-            ], 422);
-        }
-
-        $branches = BranchCloud::whereIn('branch_id', $branchIds)->get(['branch_id', 'branchName', 'address']);
+        $branches = BranchCloud::get(['branch_id', 'branchName', 'address']);
 
         return response()->json([
             'result' => true,
