@@ -188,8 +188,8 @@ class ProductsCloudController extends Controller
     }
 
     public function getCart(Request $request){
-        // IMPORTANTE: (int) fuerza a que sea un número
-        $userId = (int) $request->query('customer_id');
+        // IMPORTANTE: Se eliminó el casteo a (int) porque en la BD mongo el campo "customer" es un string (ej: "2")
+        $userId = (string) $request->query('customer_id');
     
         // Debug opcional: verifica qué estás buscando
         // \Log::info("Buscando carrito para customer: " . $userId . " tipo: " . gettype($userId));
@@ -210,8 +210,8 @@ class ProductsCloudController extends Controller
     }
 
     public function addProductToCart(Request $request){
-    // IMPORTANTE: (int) fuerza a que sea un número
-        $userId = (int) $request->customer_id; 
+        // IMPORTANTE: Se cambió a string por compatibilidad con la BD
+        $userId = (string) $request->customer_id; 
     
         $cart = Cart::where('customer', $userId)->first();
     
@@ -243,8 +243,8 @@ class ProductsCloudController extends Controller
     }
     
     public function removeProductFromCart(Request $request){
-        // IMPORTANTE: (int) fuerza a que sea un número
-        $userId = (int) $request->customer_id; 
+        // IMPORTANTE: Se cambió a string por compatibilidad con la BD
+        $userId = (string) $request->customer_id; 
     
         $cart = Cart::where('customer', $userId)->first();
         if ($cart) {
