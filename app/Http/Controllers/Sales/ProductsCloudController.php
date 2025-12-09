@@ -186,7 +186,15 @@ class ProductsCloudController extends Controller
     }
 
     public function getCart(){
+
         $cart = Cart::where('customer_id', auth()->id())->first();
+        if (!$cart) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Carrito no encontrado',
+                'data' => null
+            ], 404);
+        }
         return response()->json([
             'result' => true,
             'msg' => 'Carrito obtenido exitosamente',
