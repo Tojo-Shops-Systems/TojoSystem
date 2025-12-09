@@ -225,6 +225,14 @@ class ProductsCloudController extends Controller
     }
 
     public function createCart(Request $request){
+        $cart = Cart::where('customer_id', auth()->id())->first();
+        if ($cart) {
+            return response()->json([
+                'result' => false,
+                'msg' => 'Carrito ya existe',
+                'data' => null
+            ], 409);
+        }
         $cart = Cart::create([
             'customer_id' => auth()->id(),
             'items' => $request->items,
