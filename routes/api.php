@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/userEmployee', [AccountController::class, 'userEmployee']);
 
+Route::post('/updateTicketStatus', [TicketController::class, 'updateTicketStatus']);
+
 # Registro y logueo de usuarios de empleado o usuario
 Route::prefix('auth')->group(function () {
     # Employee routes
