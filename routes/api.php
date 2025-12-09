@@ -130,6 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cart/addProductToCart', [ProductsCloudController::class, 'addProductToCart']);
     Route::post('/cart/removeProductFromCart', [ProductsCloudController::class, 'removeProductFromCart']);
     Route::get('/cart/getCart', [ProductsCloudController::class, 'getCart']);
+    Route::post('/cart/purchaseInWeb', [TicketController::class, 'purchaseInWeb']);
 });
 
 # APIs generales para clientes o visitantes de la web
