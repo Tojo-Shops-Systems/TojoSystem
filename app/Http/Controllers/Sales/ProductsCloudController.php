@@ -185,8 +185,8 @@ class ProductsCloudController extends Controller
         ], 200);
     }
 
-    public function getCart(Request $request){
-        $cart = Cart::where('customer_id', $request->customer_id)->first();
+    public function getCart(){
+        $cart = Cart::where('customer_id', auth()->id())->first();
         return response()->json([
             'result' => true,
             'msg' => 'Carrito obtenido exitosamente',
@@ -195,7 +195,7 @@ class ProductsCloudController extends Controller
     }
 
     public function addProductToCart(Request $request){
-        $cart = Cart::where('customer_id', $request->customer_id)->first();
+        $cart = Cart::where('customer_id', auth()->id())->first();
         if ($cart) {
             // Add item to array (simplified logic)
             $items = $cart->items ?? [];
@@ -208,7 +208,7 @@ class ProductsCloudController extends Controller
     }
     
     public function removeProductFromCart(Request $request){
-        $cart = Cart::where('customer_id', $request->customer_id)->first();
+        $cart = Cart::where('customer_id', auth()->id())->first();
         if ($cart) {
             $cart->items()->detach($request->product_id);
             return response()->json([
@@ -226,7 +226,7 @@ class ProductsCloudController extends Controller
 
     public function createCart(Request $request){
         $cart = Cart::create([
-            'customer_id' => $request->customer_id,
+            'customer_id' => auth()->id(),
             'items' => $request->items,
         ]);
         return response()->json([
