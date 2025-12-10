@@ -326,18 +326,18 @@ class AccountController extends Controller
     public function userEmployee(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'CURP' => 'required|string|max:18'
+            'id' => 'required|numeric'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'result' => false,
-                'msg' => 'CURP es requerida.',
+                'msg' => 'ID de usuario requerido.',
                 'errors' => $validator->errors()
             ], 422);
         }
 
-        $user = Person::where('CURP', $request->input('CURP'))->first();
+        $user = Person::where('id', $request->input('id'))->first();
 
         if (!$user) {
             return response()->json([
